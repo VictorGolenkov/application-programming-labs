@@ -1,9 +1,10 @@
-import argparse
 import os
 import csv
 import argparse
 
-from icrawler.builtin import BingImageCrawler
+from icrawler.builtin import GoogleImageCrawler
+
+import Iterator
 
 def parser_for_program() -> tuple[str, str, str]:
     """
@@ -21,22 +22,29 @@ def parser_for_program() -> tuple[str, str, str]:
 
 def crawler(keyword: str, max_number: int, save_dir: str) -> None:
     """
-
-    :param keyword:
-    :param max_number:
-    :param save_dir:
+    Downloads images based on a given keyword.
+    :param keyword: The keyword by which images are downloaded
+    :param max_number: Maximum number of images
+    :param save_dir: The folder where the files will be saved
     :return: None
     """
-    google_crawler = BingImageCrawler(
+    google_crawler = GoogleImageCrawler(
         feeder_threads=1,
         parser_threads=2,
         downloader_threads=4,
         storage={'root_dir': save_dir})
     filters = dict(
+        size='large',
         license='noncommercial,modify')
     google_crawler.crawl(keyword=keyword, filters=filters, max_num=max_number)
 
-def create_annotation(save_dir: str, annotation_path: str):
+def create_annotation(save_dir: str, annotation_path: str) -> None:
+    """
+    Creates an annotation in a .csv file for images
+    :param save_dir: The path to the directory where the images are saved
+    :param annotation_path: The name of the annotation file
+    :return: None
+    """
     pictures = os.listdir(save_dir)
     with open(annotation_path,
               mode="w",
@@ -49,27 +57,14 @@ def create_annotation(save_dir: str, annotation_path: str):
             rel_path = os.path.join(save_dir, picture)
             writer.writerow([abs_path, rel_path])
 
-class IteratorForImages:
-    def __init__(self, limit, annotation_dir):
-        self.no_of_elements = limit
-        self.counter = 0
-        self.annotation_file = annotation_file
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.counter < self.limit:
-            self.counter = self.counter + 1
-            return self
-        else:
-            raise StopIteration
-
 def main():
-    a = parser_for_program()
-    crawler(a[0], 200, a[1])
-    create_annotation(a[1],a[2])
+    keyword, save_dir, annotation_file = parser_for_program()
+    crawler(keyword, 100, save_dir)
+    create_annotation(save_dir,annotation_file)
+    it = iter(Iterator.IteratorForImages(annotation_file))
 
+    for image in it:
+        print("Очередное значение:", image)
 
 if __name__ == "__main__":
      main()
