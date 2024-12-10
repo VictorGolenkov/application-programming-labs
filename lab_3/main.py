@@ -1,4 +1,3 @@
-import cv2
 import argparse
 
 import imageprocessor as ip
@@ -21,11 +20,12 @@ def main() -> None:
     try:
         input_file, height, width, output_file = parser()
 
-        img = cv2.imread(input_file)
+        img = ip.load_image(input_file)
 
         ip.print_image_info(img)
 
-        ip.histogram(img)
+        hist = ip.calc_hist(img)
+        ip.dis_hist(hist)
 
         resized = ip.resize(img, width, height)
 

@@ -8,7 +8,7 @@ def load_image(image_name: str) -> np.ndarray:
     :param image_name: The path with an image.
     :return: The image is in the form of np.ndarray
     """
-    img = cv2.imread('image_name')
+    img = cv2.imread(image_name)
     if img is None:
         raise FileNotFoundError("No file with that name was found!")
     return img
@@ -21,41 +21,45 @@ def print_image_info(img: np.ndarray) -> None:
     """
     print(f"Height: {img.shape[0]}, width: {img.shape[1]}")
 
-def histogram(img: np.ndarray) -> None:
+
+def calc_hist(img: np.ndarray) -> dict:
     """
-    Builds a brightness histogram for a black and white image or
-    builds a brightness histogram and a color histogram for a color image.
-    :param img: The image is in the form of np.ndarray
+    Calculates the histogram for a black and white image or
+    calculates the brightness histogram and color histograms for a color image.
+    :param img: The image in the form of np.ndarray
+    :return: A dictionary containing brightness and color histograms.
+    """
+    hist_dict = {}
+    if len(img.shape) == 2:  # Grayscale image
+        hist_dict['gray'] = cv2.calcHist([img], [0], None, [256], [0, 256])
+    else:  # Color image
+        hist_dict['gray'] = cv2.calcHist([cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)], [0], None, [256], [0, 256])
+        colors = ('b', 'g', 'r')
+        for i, color in enumerate(colors):
+            hist_dict[color] = cv2.calcHist([img], [i], None, [256], [0, 256])
+    return hist_dict
+
+def dis_hist(hist_dict: dict) -> None:
+    """
+    Plots the brightness histogram and the color histograms.
+    :param hist_dict: A dictionary containing brightness and color histograms.
     :return: None
     """
-    if len(img.shape) == 2:
-        hist = cv2.calcHist([img], [0], None, [256], [0, 256])
-        plt.figure()
-        plt.plot(hist, color='k')
-        plt.title('Гистограмма яркости')
-        plt.xlim([0, 256])
-        plt.xlabel('Интенсивность')
-        plt.ylabel('Количество пикселей')
-    else:
-        colors = ('b', 'g', 'r')
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    plt.figure(figsize=(12, 6))
 
-        plt.figure(figsize=(12, 6))
-
-        #Гистограмма яркости
+    if 'gray' in hist_dict:  # Гистограмма яркости
         ax1 = plt.subplot(1, 2, 1)
-        gray_hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
+        plt.plot(hist_dict['gray'], color='k')
         plt.title('Гистограмма яркости')
         plt.xlim([0, 256])
         plt.xlabel('Интенсивность')
         plt.ylabel('Количество пикселей')
-        plt.plot(gray_hist, color='k')
 
-        #Цветная гистограмма
+    if any(color in hist_dict for color in ('b', 'g', 'r')):  # Цветовые гистограммы
         plt.subplot(1, 2, 2, sharey=ax1)
-        for i, color in enumerate(colors):
-            color_hist = cv2.calcHist([img], [i], None, [256], [0, 256])
-            plt.plot(color_hist, color=color, label=f'Канал {color.upper()}')
+        for color in ('b', 'g', 'r'):
+            if color in hist_dict:
+                plt.plot(hist_dict[color], color=color, label=f'Канал {color.upper()}')
         plt.title('Цветовая гистограмма')
         plt.xlim([0, 256])
         plt.xlabel('Интенсивность')
@@ -104,7 +108,5 @@ def save(img: np.ndarray, path: str) -> None:
     :return: None
     """
     success = cv2.imwrite(path, img)
-    if success:
-        print(f"Изображение успешно сохранено по адресу: {path}.")
-    else:
+    if not success:
         raise IOError(f"Не удалось сохранить изображение в {path}.")
