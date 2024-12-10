@@ -1,7 +1,8 @@
 import argparse
 
-import Iterator
 import Crawler
+import Iterator
+
 
 def parser_for_program() -> tuple[str, str, str]:
     """
@@ -26,8 +27,8 @@ def main():
 
         for image in it:
             print("Очередное значение:", image)
-    except:
-        print("Error!")
+    except Exception as exc:
+        print(f"Error: {exc}")
 
 
 if __name__ == "__main__":
