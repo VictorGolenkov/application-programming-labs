@@ -16,7 +16,7 @@ def create_df(annotation: str) -> pd.DataFrame:
 
     return df
 
-def add_info_to_df(df: pd.DataFrame) -> pd.DataFrame:
+def add_info_to_df(df: pd.DataFrame) -> None:
     """
     Adds columns for image dimensions (height, width, depth) to the DataFrame.
     :param df: DataFrame containing image paths.
@@ -41,7 +41,6 @@ def add_info_to_df(df: pd.DataFrame) -> pd.DataFrame:
         raise Exception("The images have not been opened!"
                     " It is impossible to determine"
                     " their characteristics!")
-    return df
 
 def calc_stats(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -67,7 +66,7 @@ def filter_for_df(df: pd.DataFrame, max_height: int, max_width: int) -> pd.DataF
     except Exception:
         raise Exception("It is impossible to filter DataFrame!")
 
-def add_area(df: pd.DataFrame) -> pd.DataFrame:
+def add_area(df: pd.DataFrame) -> None:
     """
     Adds a new column 'Area' to the DataFrame, representing the image area.
     :param df: DataFrame containing image dimensions.
@@ -78,7 +77,6 @@ def add_area(df: pd.DataFrame) -> pd.DataFrame:
     except Exception:
         raise Exception("It is impossible to add a new column!"
                         " Perhaps the DataFrame does not exist!")
-    return df
 
 def sort_by_area(df: pd.DataFrame) -> pd.DataFrame:
     """
