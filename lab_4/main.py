@@ -30,7 +30,7 @@ def main():
         df = df_processor.create_df(annotation_file)
         print(df)
 
-        df = df_processor.add_info_to_df(df)
+        df_processor.add_info_to_df(df)
 
         print("Statistical information:")
         print(df_processor.calc_stats(df), end="\n\n")
@@ -40,7 +40,7 @@ def main():
         print("Filtered data:")
         print(filtered_df, end="\n\n")
 
-        df = df_processor.add_area(df)
+        df_processor.add_area(df)
         df = df_processor.sort_by_area(df)
         print("Sorted data:")
         print(df, end="\n\n")
